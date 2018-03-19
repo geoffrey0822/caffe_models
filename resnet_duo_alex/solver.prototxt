@@ -1,0 +1,14 @@
+test_iter: 748
+test_interval: 1855
+base_lr: 0.001
+max_iter: 55650
+lr_policy: "step"
+gamma: 0.1
+weight_decay: 1e-05
+stepsize: 18365
+snapshot: 18550
+snapshot_prefix: "snapshot_resnet_alexnet"
+solver_mode: GPU
+net: "trainval.prototxt"
+iter_size: 1
+type: "SGD"
