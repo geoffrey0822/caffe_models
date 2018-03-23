@@ -1,0 +1,357 @@
+layer {
+  name: "train-data"
+  type: "Python"
+  top: "data"
+  top: "labels"
+  include {
+    phase: TRAIN
+  }
+  python_param {
+    module: "caffe.multilabelDataLayer"
+    layer: "MultilabelDataLyer"
+    param_str: "{\"scale-to-width\":224,\"scale-to-height\":224,\"batch_size\":64,\"channel\":3,\"mode\":\"multichannel\",\"db_file\":\"r_train.csv\"}"
+  }
+}
+layer {
+  name: "val-data"
+  type: "Python"
+  top: "data"
+  top: "labels"
+  include {
+    phase: TEST
+  }
+  python_param {
+    module: "caffe.multilabelDataLayer"
+    layer: "MultilabelDataLyer"
+    param_str: "{\"scale-to-width\":224,\"scale-to-height\":224,\"batch_size\":32,\"channel\":3,\"mode\":\"multichannel\",\"db_file\":\"r_val.csv\"}"
+  }
+}
+layer {
+  name: "split_label"
+  type: "Slice"
+  bottom: "labels"
+  top: "nothing"
+  top: "label"
+  slice_param {
+    slice_point: 1
+    axis: 1
+  }
+}
+layer {
+  name: "ignore"
+  type: "Silence"
+  bottom: "nothing"
+}
+layer {
+  name: "view1/slice1"
+  type: "Slice"
+  bottom: "data"
+  top: "view1/sobelX"
+  top: "view1/sobelY"
+  top: "view1/grayscale"
+  slice_param {
+    slice_point: 1
+    slice_point: 2
+    axis: 1
+  }
+}
+layer {
+  name: "view1/gs_conv1"
+  type: "Convolution"
+  bottom: "view1/grayscale"
+  top: "view1/gs_conv1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 32
+    pad: 2
+    kernel_size: 5
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "view1/gs_pool1"
+  type: "Pooling"
+  bottom: "view1/gs_conv1"
+  top: "view1/gs_pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 9
+    stride: 3
+  }
+}
+layer {
+  name: "view1/gs_conv2"
+  type: "Convolution"
+  bottom: "view1/gs_pool1"
+  top: "view1/gs_conv2"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 9
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "view1/gs_pool2"
+  type: "Pooling"
+  bottom: "view1/gs_conv2"
+  top: "view1/gs_pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 5
+    stride: 2
+  }
+}
+layer {
+  name: "view1/sobelX_conv1"
+  type: "Convolution"
+  bottom: "view1/sobelX"
+  top: "view1/sobelX_conv1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 32
+    pad: 4
+    kernel_size: 9
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "view1/sobelX_pool1"
+  type: "Pooling"
+  bottom: "view1/sobelX_conv1"
+  top: "view1/sobelX_pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 9
+    stride: 3
+  }
+}
+layer {
+  name: "view1/sobelX_conv2"
+  type: "Convolution"
+  bottom: "view1/sobelX_pool1"
+  top: "view1/sobelX_conv2"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 9
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "view1/sobelX_pool2"
+  type: "Pooling"
+  bottom: "view1/sobelX_conv2"
+  top: "view1/sobelX_pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 5
+    stride: 2
+  }
+}
+layer {
+  name: "view1/sobelY_conv1"
+  type: "Convolution"
+  bottom: "view1/sobelY"
+  top: "view1/sobelY_conv1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 32
+    pad: 4
+    kernel_size: 9
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "view1/sobelY_pool1"
+  type: "Pooling"
+  bottom: "view1/sobelY_conv1"
+  top: "view1/sobelY_pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 9
+    stride: 3
+  }
+}
+layer {
+  name: "view1/sobelY_conv2"
+  type: "Convolution"
+  bottom: "view1/sobelY_pool1"
+  top: "view1/sobelY_conv2"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 9
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "view1/sobelY_pool2"
+  type: "Pooling"
+  bottom: "view1/sobelY_conv2"
+  top: "view1/sobelY_pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 5
+    stride: 2
+  }
+}
+layer {
+  name: "view1/concat"
+  type: "Concat"
+  bottom: "view1/gs_pool2"
+  bottom: "view1/sobelX_pool2"
+  bottom: "view1/sobelY_pool2"
+  top: "view1/out"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "view1/fc1"
+  type: "InnerProduct"
+  bottom: "view1/out"
+  top: "view1/fc1"
+  param {
+    name: "feat_w"
+    lr_mult: 1.0
+  }
+  param {
+    name: "feat_b"
+    lr_mult: 2.0
+  }
+  inner_product_param {
+    num_output: 512
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "view1/fc2"
+  type: "InnerProduct"
+  bottom: "view1/fc1"
+  top: "view1/fc2"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  inner_product_param {
+    num_output: 28
+  }
+}
+layer {
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "view1/fc2"
+  bottom: "label"
+  top: "accuracy"
+  include {
+    phase: TEST
+  }
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "view1/fc2"
+  bottom: "label"
+  top: "loss"
+}
